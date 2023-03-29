@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "units/./"
+      component: "lib:units"
+
+    - path: "units-defs/./"
+      component: "lib:units-defs"
+
+    - path: "units-test/./"
+      component: "units-test:test:main"

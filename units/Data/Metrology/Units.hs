@@ -24,6 +24,8 @@ module Data.Metrology.Units where
 
 import Data.Metrology.Z
 import Data.Metrology.Factor
+import Data.Metrology.R
+import Data.Metrology.Offset
 import Data.Metrology.Dimensions
 import Data.Metrology.LCSU
 import Data.Type.Bool
@@ -152,6 +154,23 @@ instance (UnitFactor rest, Unit unit, SingI n) => UnitFactor (F unit n ': rest) 
   canonicalConvRatioSpec _ =
     (canonicalConvRatio (undefined :: unit) ^^ szToInt (sing :: Sing n)) *
     canonicalConvRatioSpec (Proxy :: Proxy rest)
+
+
+-----------------------------------------------------------------------
+-- Conversion offsets for units
+-----------------------------------------------------------------------
+
+type family ShiftedUnit (offset :: Offset *) :: Constraint where
+  ShiftedUnit (O unit r) = Unit unit
+
+-- | Classifies a unit offset, and permits calculating a converison offset
+-- for the purposes of LCSU conversions.
+class (ShiftedUnit unit) => UnitOffset (unit :: Offset *) where
+  canonicalConvOffsetSpec :: Proxy unit -> Rational
+
+instance (Unit unit, SingI n) => UnitOffset (O unit n) where
+  canonicalConvOffsetSpec _= srToRational (sing :: Sing n)
+  
 
 -------------------------------------------------------------
 --- "Number" unit -------------------------------------------

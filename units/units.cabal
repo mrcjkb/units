@@ -85,6 +85,7 @@ library
     Data.Metrology.Show,
     Data.Metrology.Unsafe,
     Data.Metrology.Z,
+    Data.Metrology.R,
     Data.Metrology.Set,
     Data.Metrology.Vector,
     Data.Metrology.Linear,
@@ -95,6 +96,7 @@ library
 
   other-modules:
     Data.Metrology.Factor,
+    Data.Metrology.Offset,
     Data.Metrology.LCSU,
     Data.Metrology.Qu,
     Data.Metrology.Dimensions,

@@ -11,7 +11,7 @@
 {-# LANGUAGE TypeFamilies, DataKinds, TypeOperators, UndecidableInstances,
              GADTs, PolyKinds, TemplateHaskell, ScopedTypeVariables,
              EmptyCase, CPP, TypeSynonymInstances, FlexibleInstances,
-             InstanceSigs, FlexibleContexts #-}
+             InstanceSigs, FlexibleContexts, StandaloneDeriving #-}
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE TypeApplications #-}
 #endif
@@ -57,6 +57,7 @@ module Data.Metrology.Z (
 
   -- * Conversions
   zToInt, szToInt,
+  intToZ,
 
   -- * Type-level operations
   -- ** Arithmetic
@@ -67,8 +68,10 @@ module Data.Metrology.Z (
   type (Data.Metrology.Z.<), NonNegative,
 
   -- * Synonyms for certain numbers
-  One, Two, Three, Four, Five, MOne, MTwo, MThree, MFour, MFive,
-  sZero, sOne, sTwo, sThree, sFour, sFive, sMOne, sMTwo, sMThree, sMFour, sMFive,
+  One, Two, Three, Four, Five, Six, Seven, Eight, Nine,
+  MOne, MTwo, MThree, MFour, MFive, MSix, MSeven, MEight, MNine,
+  sZero, sOne, sTwo, sThree, sFour, sFive, sSix, sSeven, sEight, sNine,
+  sMOne, sMTwo, sMThree, sMFour, sMFive, sMSix, sMSeven, sMEight, sMNine,
 
   -- * Deprecated synonyms
   pZero, pOne, pTwo, pThree, pFour, pFive, pMOne, pMTwo, pMThree, pMFour, pMFive,
@@ -82,13 +85,19 @@ import Data.Singletons.Base.TH hiding ( Negate, sNegate, NegateSym0, NegateSym1 
 import GHC.Exts ( Constraint )
 
 -- | The datatype for type-level integers.
-$(singletons [d| data Z = Zero | S Z | P Z deriving Eq |])
+$(singletons [d| data Z = Zero | S Z | P Z deriving (Eq, Show) |])
 
 -- | Convert a 'Z' to an 'Int'
 zToInt :: Z -> Int
 zToInt Zero = 0
 zToInt (S z) = zToInt z + 1
 zToInt (P z) = zToInt z - 1
+
+-- | Convert an 'Int' to a 'Z'
+intToZ :: Int -> Z
+intToZ 0 = Zero
+intToZ n | n < 0 = P $ intToZ $ n + 1
+         | otherwise = S $ intToZ $ n - 1
 
 -- | Add one to an integer
 type family Succ (z :: Z) :: Z where
@@ -174,12 +183,20 @@ type Two   = S One
 type Three = S Two
 type Four  = S Three
 type Five  = S Four
+type Six   = S Five
+type Seven = S Six
+type Eight = S Seven
+type Nine  = S Eight
 
 type MOne   = P Zero
 type MTwo   = P MOne
 type MThree = P MTwo
 type MFour  = P MThree
 type MFive  = P MFour
+type MSix   = P MFive
+type MSeven = P MSix
+type MEight = P MSeven
+type MNine  = P MEight
 
 -- | This is the singleton value representing @Zero@ at the term level and
 -- at the type level, simultaneously. Used for raising units to powers.
@@ -189,12 +206,20 @@ sTwo   = SS sOne
 sThree = SS sTwo
 sFour  = SS sThree
 sFive  = SS sFour
+sSix   = SS sFive
+sSeven = SS sSix
+sEight = SS sSeven
+sNine  = SS sEight
 
 sMOne   = SP sZero
 sMTwo   = SP sMOne
 sMThree = SP sMTwo
 sMFour  = SP sMThree
 sMFive  = SP sMFour
+sMSix   = SP sMFive
+sMSeven = SP sMSix
+sMEight = SP sMSeven
+sMNine  = SP sMEight
 
 -- | Add one to a singleton @Z@.
 sSucc :: Sing z -> Sing (Succ z)
